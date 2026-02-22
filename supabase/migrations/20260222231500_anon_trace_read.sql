@@ -22,3 +22,8 @@ CREATE POLICY "Anon can view cooperatives for trace"
 CREATE POLICY "Anon can view production logs for trace"
   ON public.production_log FOR SELECT
   TO anon USING (true);
+
+-- Allow anon to read slaughter_batch (for meat trace lookup)
+CREATE POLICY "Anon can view slaughter batches for trace"
+  ON public.slaughter_batch FOR SELECT
+  TO anon USING (true);

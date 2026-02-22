@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Egg } from "lucide-react";
 import QRCode from "qrcode";
 import { BiovolaillesLoader } from "@/components/BiovolaillesLoader";
-import { TraceHero } from "@/components/trace/TraceHero";
+import { TraceHero, type FarmTheme } from "@/components/trace/TraceHero";
 import { TraceStepCard, DataRow } from "@/components/trace/TraceStepCard";
 import { TraceFooter } from "@/components/trace/TraceFooter";
 import { TraceEgg3D } from "@/components/trace/TraceEgg3D";
@@ -19,6 +19,7 @@ const TraceBatch = () => {
   const [productionLog, setProductionLog] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [productType, setProductType] = useState<FarmTheme>("eggs");
   const [lang, setLang] = useState<Lang>("fr");
   const [qrDataUrl, setQrDataUrl] = useState<string>();
 
@@ -30,7 +31,7 @@ const TraceBatch = () => {
         width: 256,
         margin: 1,
         color: { dark: "#0a2e1a", light: "#ffffff" },
-      }).then(setQrDataUrl).catch(() => {});
+      }).then(setQrDataUrl).catch(() => { });
     }
   }, [batchRef]);
 
@@ -43,7 +44,22 @@ const TraceBatch = () => {
         .maybeSingle();
 
       if (!data) {
-        setNotFound(true);
+        // Try slaughter_batch as fallback
+        const { data: slaughterData } = await supabase
+          .from("slaughter_batch")
+          .select("*, flock(*, cooperative(*))")
+          .eq("batch_ref", batchRef || "")
+          .maybeSingle();
+
+        if (!slaughterData) {
+          setNotFound(true);
+          setLoading(false);
+          return;
+        }
+
+        setProductType("meat");
+        setBatch(slaughterData);
+        supabase.from("scan_log").insert({ batch_ref: batchRef || "" });
         setLoading(false);
         return;
       }
@@ -113,9 +129,8 @@ const TraceBatch = () => {
                 <button
                   key={l}
                   onClick={() => setLang(l)}
-                  className={`text-xs px-3 py-1 rounded-full transition-colors ${
-                    lang === l ? "gradient-gold text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`text-xs px-3 py-1 rounded-full transition-colors ${lang === l ? "gradient-gold text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
                 >
                   {l === "fr" ? "🇫🇷 FR" : l === "ar" ? "🇲🇦 عر" : "🇬🇧 EN"}
                 </button>
@@ -133,11 +148,7 @@ const TraceBatch = () => {
   return (
     <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
       {/* Hero with 3D egg */}
-      <TraceHero lang={lang} setLang={setLang}>
-        <Suspense fallback={null}>
-          <TraceEgg3D qrDataUrl={qrDataUrl} />
-        </Suspense>
-      </TraceHero>
+      <TraceHero lang={lang} setLang={setLang} theme={productType} />
 
       {/* Verification badge */}
       <div className="max-w-lg mx-auto px-6 -mt-4 relative z-10">
