@@ -13,7 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Building2, Bird, Package, Scissors, LogOut, Egg, Crown, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Building2, Bird, Package, Scissors, LogOut, Egg, Crown, ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type NavItem = { title: string; icon: React.ElementType; path: string; roles?: string[] };
@@ -24,6 +24,7 @@ const allNavItems: NavItem[] = [
   { title: "Lots d'élevage", icon: Bird, path: "/flocks" },
   { title: "Conditionnement", icon: Package, path: "/packaging", roles: ["super_admin", "conditioning_operator", "cooperative_manager"] },
   { title: "Abattage", icon: Scissors, path: "/slaughter", roles: ["super_admin", "abattoir_operator", "cooperative_manager"] },
+  { title: "Utilisateurs", icon: Users, path: "/users", roles: ["super_admin"] },
 ];
 
 const roleConfig: Record<string, { label: string; icon: React.ElementType; colorClass: string }> = {
@@ -79,11 +80,10 @@ export function AppSidebar() {
                       isActive={active}
                       onClick={() => navigate(navItem.path)}
                       tooltip={navItem.title}
-                      className={`transition-all duration-200 rounded-lg ${
-                        active
+                      className={`transition-all duration-200 rounded-lg ${active
                           ? "bg-sidebar-accent text-gold border-gold-strong border"
                           : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       <navItem.icon className={`h-4 w-4 ${active ? "text-gold" : ""}`} />
                       <span className="font-medium">{navItem.title}</span>

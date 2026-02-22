@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   roles: AppRole[];
+  approved: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
@@ -21,15 +22,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
+  const [approved, setApproved] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const fetchRoles = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-    if (data) {
-      setRoles(data.map((r) => r.role as AppRole));
+  const fetchRolesAndApproval = async (userId: string) => {
+    const [rolesRes, profileRes] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", userId),
+      supabase.from("profiles").select("approved").eq("id", userId).maybeSingle(),
+    ]);
+    if (rolesRes.data) {
+      const userRoles = rolesRes.data.map((r) => r.role as AppRole);
+      setRoles(userRoles);
+      // Super admins are always approved
+      if (userRoles.includes("super_admin")) {
+        setApproved(true);
+      } else {
+        setApproved(profileRes.data?.approved ?? false);
+      }
     }
   };
 
@@ -39,9 +48,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          setTimeout(() => fetchRoles(session.user.id), 0);
+          setTimeout(() => fetchRolesAndApproval(session.user.id), 0);
         } else {
           setRoles([]);
+          setApproved(false);
         }
         setLoading(false);
       }
@@ -51,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchRoles(session.user.id);
+        fetchRolesAndApproval(session.user.id);
       }
       setLoading(false);
     });
@@ -80,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const hasRole = (role: AppRole) => roles.includes(role);
 
   return (
-    <AuthContext.Provider value={{ user, session, roles, loading, signIn, signUp, signOut, hasRole }}>
+    <AuthContext.Provider value={{ user, session, roles, approved, loading, signIn, signUp, signOut, hasRole }}>
       {children}
     </AuthContext.Provider>
   );
