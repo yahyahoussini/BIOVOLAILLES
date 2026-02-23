@@ -16,29 +16,50 @@ const t = {
     ar: "تتبع كامل من المزرعة إلى مائدتك",
     en: "Complete traceability from farm to your table",
   },
+
+  /* ── Step 1: The animal ── */
   step1_title: {
     fr: "LA POULE",
     ar: "الدجاجة",
     en: "THE HEN",
   },
   step1_icon: "🐔",
+  step1_title_meat: {
+    fr: "L'ANIMAL",
+    ar: "الحيوان",
+    en: "THE ANIMAL",
+  },
+  step1_icon_meat: "🐄",
   breed: { fr: "Race", ar: "السلالة", en: "Breed" },
+  animal_type: { fr: "Type d'animal", ar: "نوع الحيوان", en: "Animal Type" },
   cooperative: { fr: "Coopérative", ar: "التعاونية", en: "Cooperative" },
   location: { fr: "Localisation", ar: "الموقع", en: "Location" },
   arrival: { fr: "Date d'arrivée", ar: "تاريخ الوصول", en: "Arrival Date" },
+  weight: { fr: "Poids moyen", ar: "الوزن المتوسط", en: "Average Weight" },
+  head_count: { fr: "Nombre de têtes", ar: "عدد الرؤوس", en: "Head Count" },
 
+  /* ── Step 2: The product ── */
   step2_title: {
     fr: "L'ŒUF",
     ar: "البيضة",
     en: "THE EGG",
   },
   step2_icon: "🥚",
+  step2_title_meat: {
+    fr: "LA VIANDE",
+    ar: "اللحم",
+    en: "THE MEAT",
+  },
+  step2_icon_meat: "🥩",
   collection_date: { fr: "Date de collecte", ar: "تاريخ الجمع", en: "Collection Date" },
+  slaughter_date: { fr: "Date d'abattage", ar: "تاريخ الذبح", en: "Slaughter Date" },
   feed_type: { fr: "Type d'alimentation", ar: "نوع العلف", en: "Feed Type" },
   vet_cert: { fr: "Contrôle vétérinaire", ar: "فحص بيطري", en: "Vet Certification" },
   passed: { fr: "Validé ✅", ar: "ناجح ✅", en: "Passed ✅" },
   pending: { fr: "En attente", ar: "قيد الانتظار", en: "Pending" },
+  total_weight: { fr: "Poids total (kg)", ar: "الوزن الإجمالي (كغ)", en: "Total Weight (kg)" },
 
+  /* ── Step 3: Conditioning ── */
   step3_title: {
     fr: "CONDITIONNEMENT",
     ar: "التكييف",
@@ -50,6 +71,7 @@ const t = {
   onssa: { fr: "Numéro ONSSA", ar: "رقم ONSSA", en: "ONSSA Number" },
   package_date_label: { fr: "Date de conditionnement", ar: "تاريخ التعبئة", en: "Packaging Date" },
 
+  /* ── Step 4: Your pack ── */
   step4_title: {
     fr: "VOTRE PACK",
     ar: "عبوتك",
@@ -58,8 +80,11 @@ const t = {
   step4_icon: "📦",
   quantity: { fr: "Quantité", ar: "الكمية", en: "Quantity" },
   eggs: { fr: "œufs", ar: "بيضة", en: "eggs" },
+  pieces: { fr: "pièces", ar: "قطعة", en: "pieces" },
+  kg: { fr: "kg", ar: "كغ", en: "kg" },
   expiry: { fr: "Date d'expiration", ar: "تاريخ الانتهاء", en: "Expiry Date" },
 
+  /* ── Footer / other ── */
   proud: {
     fr: "Fiers de nourrir le Maroc",
     ar: "فخورون بإطعام المغرب",

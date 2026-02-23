@@ -39,7 +39,7 @@ const TraceBatch = () => {
     const fetchData = async () => {
       const { data } = await supabase
         .from("packaging_batch")
-        .select("*, flock(*, cooperative(*))")
+        .select("*, flock(*, cooperative(*)), livestock(*, cooperative(*))")
         .eq("batch_ref", batchRef || "")
         .maybeSingle();
 
@@ -47,7 +47,7 @@ const TraceBatch = () => {
         // Try slaughter_batch as fallback
         const { data: slaughterData } = await supabase
           .from("slaughter_batch")
-          .select("*, flock(*, cooperative(*))")
+          .select("*, flock(*, cooperative(*)), livestock(*, cooperative(*))")
           .eq("batch_ref", batchRef || "")
           .maybeSingle();
 
@@ -57,11 +57,16 @@ const TraceBatch = () => {
           return;
         }
 
-        setProductType("meat");
+        setProductType(slaughterData.livestock_id ? "meat" : "meat");
         setBatch(slaughterData);
         supabase.from("scan_log").insert({ batch_ref: batchRef || "" });
         setLoading(false);
         return;
+      }
+
+      // Detect meat vs eggs based on source
+      if (data.livestock_id) {
+        setProductType("meat");
       }
 
       setBatch(data);
@@ -142,8 +147,10 @@ const TraceBatch = () => {
     );
   }
 
-  const coop = batch.flock?.cooperative;
+  const coop = batch.flock?.cooperative || batch.livestock?.cooperative;
   const flock = batch.flock;
+  const isMeat = productType === "meat";
+  const source = isMeat ? batch.livestock : batch.flock;
 
   return (
     <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
@@ -186,16 +193,25 @@ const TraceBatch = () => {
 
       {/* Journey Timeline */}
       <main className="max-w-lg mx-auto px-6 py-10 space-y-6">
-        <TraceStepCard icon={t.step1_icon} title={t.step1_title[lang]} stepNumber={1} lang={lang}>
-          {flock?.breed_photo_url && (
+        {/* Step 1: The Animal / The Hen */}
+        <TraceStepCard
+          icon={isMeat ? t.step1_icon_meat : t.step1_icon}
+          title={isMeat ? t.step1_title_meat[lang] : t.step1_title[lang]}
+          stepNumber={1}
+          lang={lang}
+        >
+          {source?.breed_photo_url && (
             <div className="rounded-xl overflow-hidden mb-4 border border-border/50">
-              <img src={flock.breed_photo_url} alt={flock.breed} className="w-full h-36 object-cover" loading="lazy" />
+              <img src={source.breed_photo_url} alt={source.breed} className="w-full h-36 object-cover" loading="lazy" />
             </div>
           )}
-          <DataRow label={t.breed[lang]} value={flock?.breed} />
+          {isMeat && <DataRow label={t.animal_type[lang]} value={source?.animal_type} />}
+          <DataRow label={t.breed[lang]} value={source?.breed} />
           <DataRow label={t.cooperative[lang]} value={coop?.name} />
           <DataRow label={t.location[lang]} value={coop?.location || t.na[lang]} />
-          <DataRow label={t.arrival[lang]} value={flock?.arrival_date} />
+          {isMeat && <DataRow label={t.head_count[lang]} value={source?.quantity} />}
+          {isMeat && <DataRow label={t.weight[lang]} value={source?.weight_avg_kg ? `${source.weight_avg_kg} kg` : t.na[lang]} />}
+          <DataRow label={t.arrival[lang]} value={source?.arrival_date} />
           {coop?.gps_lat && coop?.gps_lng && (
             <div className="mt-3 rounded-xl overflow-hidden border border-border/50">
               <iframe
@@ -208,12 +224,30 @@ const TraceBatch = () => {
           )}
         </TraceStepCard>
 
-        <TraceStepCard icon={t.step2_icon} title={t.step2_title[lang]} stepNumber={2} lang={lang}>
-          <DataRow label={t.collection_date[lang]} value={productionLog?.collection_date || batch.package_date} />
-          <DataRow label={t.feed_type[lang]} value={productionLog?.feed_type || flock?.feed_type || t.na[lang]} />
-          <DataRow label={t.vet_cert[lang]} value={productionLog?.vet_check_passed ? t.passed[lang] : t.pending[lang]} />
+        {/* Step 2: The Egg / The Meat */}
+        <TraceStepCard
+          icon={isMeat ? t.step2_icon_meat : t.step2_icon}
+          title={isMeat ? t.step2_title_meat[lang] : t.step2_title[lang]}
+          stepNumber={2}
+          lang={lang}
+        >
+          {isMeat ? (
+            <>
+              <DataRow label={t.slaughter_date[lang]} value={batch.slaughter_date || batch.package_date} />
+              <DataRow label={t.total_weight[lang]} value={batch.total_kg ? `${batch.total_kg} kg` : t.na[lang]} />
+              <DataRow label={t.feed_type[lang]} value={source?.feed_type || t.na[lang]} />
+              <DataRow label={t.vet_cert[lang]} value={productionLog?.vet_check_passed ? t.passed[lang] : t.pending[lang]} />
+            </>
+          ) : (
+            <>
+              <DataRow label={t.collection_date[lang]} value={productionLog?.collection_date || batch.package_date} />
+              <DataRow label={t.feed_type[lang]} value={productionLog?.feed_type || flock?.feed_type || t.na[lang]} />
+              <DataRow label={t.vet_cert[lang]} value={productionLog?.vet_check_passed ? t.passed[lang] : t.pending[lang]} />
+            </>
+          )}
         </TraceStepCard>
 
+        {/* Step 3: Conditioning */}
         <TraceStepCard icon={t.step3_icon} title={t.step3_title[lang]} stepNumber={3} lang={lang}>
           <DataRow label={t.package_date_label[lang]} value={batch.package_date} />
           <DataRow label={t.grade[lang]} value={batch.grade || t.na[lang]} />
@@ -221,8 +255,18 @@ const TraceBatch = () => {
           <DataRow label={t.onssa[lang]} value={batch.onssa_number || t.na[lang]} />
         </TraceStepCard>
 
+        {/* Step 4: Your Pack */}
         <TraceStepCard icon={t.step4_icon} title={t.step4_title[lang]} stepNumber={4} lang={lang} isLast>
-          <DataRow label={t.quantity[lang]} value={`${batch.quantity_eggs} ${t.eggs[lang]}`} />
+          {isMeat ? (
+            <>
+              <DataRow label={t.quantity[lang]} value={`${batch.quantity_eggs || batch.quantity_birds || "—"} ${t.pieces[lang]}`} />
+              <DataRow label={t.total_weight[lang]} value={batch.total_kg ? `${batch.total_kg} ${t.kg[lang]}` : t.na[lang]} />
+            </>
+          ) : (
+            <>
+              <DataRow label={t.quantity[lang]} value={`${batch.quantity_eggs} ${t.eggs[lang]}`} />
+            </>
+          )}
           <DataRow label={t.package_date_label[lang]} value={batch.package_date} />
           <DataRow label={t.expiry[lang]} value={batch.expiry_date || t.na[lang]} />
         </TraceStepCard>
