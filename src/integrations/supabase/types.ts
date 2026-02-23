@@ -178,9 +178,10 @@ export type Database = {
           batch_ref: string
           created_at: string
           expiry_date: string | null
-          flock_id: string
+          flock_id: string | null
           grade: string | null
           id: string
+          livestock_id: string | null
           onssa_number: string | null
           package_date: string
           qr_code_url: string | null
@@ -191,9 +192,10 @@ export type Database = {
           batch_ref: string
           created_at?: string
           expiry_date?: string | null
-          flock_id: string
+          flock_id?: string | null
           grade?: string | null
           id?: string
+          livestock_id?: string | null
           onssa_number?: string | null
           package_date?: string
           qr_code_url?: string | null
@@ -204,9 +206,10 @@ export type Database = {
           batch_ref?: string
           created_at?: string
           expiry_date?: string | null
-          flock_id?: string
+          flock_id?: string | null
           grade?: string | null
           id?: string
+          livestock_id?: string | null
           onssa_number?: string | null
           package_date?: string
           qr_code_url?: string | null
@@ -219,6 +222,13 @@ export type Database = {
             columns: ["flock_id"]
             isOneToOne: false
             referencedRelation: "flock"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "packaging_batch_livestock_id_fkey"
+            columns: ["livestock_id"]
+            isOneToOne: false
+            referencedRelation: "livestock"
             referencedColumns: ["id"]
           },
         ]
