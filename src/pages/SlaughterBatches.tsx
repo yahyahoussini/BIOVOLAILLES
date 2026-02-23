@@ -30,6 +30,7 @@ const SlaughterBatches = () => {
     source_id: "",
     quantity_birds: "",
     total_kg: "",
+    onssa_number: "",
   });
 
   const canCreate = hasRole("super_admin") || hasRole("abattoir_operator");
@@ -66,6 +67,7 @@ const SlaughterBatches = () => {
       quantity_birds: parseInt(form.quantity_birds) || 0,
       total_kg: parseFloat(form.total_kg) || 0,
       batch_ref: batchRef,
+      onssa_number: form.onssa_number || null,
     };
 
     if (form.source_type === "flock") {
@@ -86,7 +88,7 @@ const SlaughterBatches = () => {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Lot d'abattage créé ✅", description: `Réf: ${batchRef}` });
-      setForm({ source_type: "flock", source_id: "", quantity_birds: "", total_kg: "" });
+      setForm({ source_type: "flock", source_id: "", quantity_birds: "", total_kg: "", onssa_number: "" });
       setOpen(false);
       fetchData();
     }
@@ -190,6 +192,16 @@ const SlaughterBatches = () => {
                       className="bg-secondary/50 border-border"
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Numéro ONSSA</Label>
+                  <Input
+                    value={form.onssa_number}
+                    onChange={(e) => setForm({ ...form, onssa_number: e.target.value })}
+                    placeholder="ex: ONSSA-2026-XXXX"
+                    className="bg-secondary/50 border-border"
+                  />
                 </div>
 
                 <Button type="submit" className="w-full gradient-gold text-primary-foreground font-semibold">

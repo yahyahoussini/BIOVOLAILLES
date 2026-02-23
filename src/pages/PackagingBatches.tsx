@@ -33,6 +33,7 @@ const PackagingBatches = () => {
     source_id: "",
     quantity_eggs: "",
     grade: "",
+    onssa_number: "",
   });
   const { particles, triggerBurst } = useParticleBurst();
   const { enabled: soundEnabled, toggle: toggleSound, play: playSound } = useSoundEffect();
@@ -114,6 +115,7 @@ const PackagingBatches = () => {
     const insertData: any = {
       quantity_eggs: parseInt(form.quantity_eggs) || 0,
       grade: form.grade || null,
+      onssa_number: form.onssa_number || null,
       batch_ref: batchRef,
       qr_code_url: traceUrl,
     };
@@ -136,7 +138,7 @@ const PackagingBatches = () => {
       triggerBurst();
       playSound();
       toast({ title: "✨ Lot créé avec succès", description: `Réf: ${batchRef}` });
-      setForm({ source_type: "flock", source_id: "", quantity_eggs: "", grade: "" });
+      setForm({ source_type: "flock", source_id: "", quantity_eggs: "", grade: "", onssa_number: "" });
       setOpen(false);
       fetchData();
       if (inserted) {
@@ -260,6 +262,15 @@ const PackagingBatches = () => {
                       value={form.grade}
                       onChange={(e) => setForm({ ...form, grade: e.target.value })}
                       placeholder="A, B, C..."
+                      className="bg-secondary/50 border-border"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Numéro ONSSA</Label>
+                    <Input
+                      value={form.onssa_number}
+                      onChange={(e) => setForm({ ...form, onssa_number: e.target.value })}
+                      placeholder="ex: ONSSA-2026-XXXX"
                       className="bg-secondary/50 border-border"
                     />
                   </div>

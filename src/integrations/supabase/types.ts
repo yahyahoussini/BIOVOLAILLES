@@ -334,6 +334,7 @@ export type Database = {
           flock_id: string | null
           livestock_id: string | null
           id: string
+          onssa_number: string | null
           qr_code_url: string | null
           quantity_birds: number
           slaughter_date: string
@@ -345,6 +346,7 @@ export type Database = {
           flock_id?: string | null
           livestock_id?: string | null
           id?: string
+          onssa_number?: string | null
           qr_code_url?: string | null
           quantity_birds?: number
           slaughter_date?: string
@@ -356,6 +358,7 @@ export type Database = {
           flock_id?: string | null
           livestock_id?: string | null
           id?: string
+          onssa_number?: string | null
           qr_code_url?: string | null
           quantity_birds?: number
           slaughter_date?: string
