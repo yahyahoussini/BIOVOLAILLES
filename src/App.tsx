@@ -14,6 +14,7 @@ import SlaughterBatches from "@/pages/SlaughterBatches";
 import NotFound from "@/pages/NotFound";
 import TraceBatch from "@/pages/TraceBatch";
 import UserManagement from "@/pages/UserManagement";
+import Livestock from "@/pages/Livestock";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="/packaging" element={<PackagingBatches />} />
               <Route path="/slaughter" element={<SlaughterBatches />} />
               <Route path="/users" element={<UserManagement />} />
+              <Route path="/livestock" element={<Livestock />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -94,6 +94,50 @@ export type Database = {
           },
         ]
       }
+      livestock: {
+        Row: {
+          id: string
+          cooperative_id: string
+          animal_type: string
+          breed: string
+          quantity: number
+          weight_avg_kg: number | null
+          feed_type: string | null
+          arrival_date: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          cooperative_id: string
+          animal_type: string
+          breed: string
+          quantity?: number
+          weight_avg_kg?: number | null
+          feed_type?: string | null
+          arrival_date?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          cooperative_id?: string
+          animal_type?: string
+          breed?: string
+          quantity?: number
+          weight_avg_kg?: number | null
+          feed_type?: string | null
+          arrival_date?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "livestock_cooperative_id_fkey"
+            columns: ["cooperative_id"]
+            isOneToOne: false
+            referencedRelation: "cooperative"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incubation_batch: {
         Row: {
           created_at: string
@@ -277,7 +321,8 @@ export type Database = {
         Row: {
           batch_ref: string
           created_at: string
-          flock_id: string
+          flock_id: string | null
+          livestock_id: string | null
           id: string
           qr_code_url: string | null
           quantity_birds: number
@@ -287,7 +332,8 @@ export type Database = {
         Insert: {
           batch_ref: string
           created_at?: string
-          flock_id: string
+          flock_id?: string | null
+          livestock_id?: string | null
           id?: string
           qr_code_url?: string | null
           quantity_birds?: number
@@ -297,7 +343,8 @@ export type Database = {
         Update: {
           batch_ref?: string
           created_at?: string
-          flock_id?: string
+          flock_id?: string | null
+          livestock_id?: string | null
           id?: string
           qr_code_url?: string | null
           quantity_birds?: number
@@ -310,6 +357,13 @@ export type Database = {
             columns: ["flock_id"]
             isOneToOne: false
             referencedRelation: "flock"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slaughter_batch_livestock_id_fkey"
+            columns: ["livestock_id"]
+            isOneToOne: false
+            referencedRelation: "livestock"
             referencedColumns: ["id"]
           },
         ]
